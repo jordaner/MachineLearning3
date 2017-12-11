@@ -1,4 +1,3 @@
-import matplotlib.pyplot as plt
 import numpy as np
 from sklearn import linear_model
 from sklearn.model_selection import cross_val_score, KFold
@@ -33,143 +32,138 @@ def normaliseScores(scores):
     normalised_scores = np.array([(new_min + (((x-old_min)*(new_max-new_min)))/(old_max - old_min)) for x in scores])
     return normalised_scores
 
-whiteWineFeatures = ['fixed acidity','volatile acidity','citric acid','residual sugar','chlorides']
+whiteWineFeatures = ['fixed acidity','volatile acidity','citric acid','residual sugar','chlorides','free sulfur dioxide','total sulfur dioxide','density','pH','sulphates','alcohol']
 
-redWineFeatures = ['fixed acidity','volatile acidity','citric acid','residual sugar','chlorides']
-
-samples_sizes= [100,500,1000,5000,10000,50000,100000,500000,1000000,5000000,10000000,50000000,100000000]
+redWineFeatures = ['fixed acidity','volatile acidity','citric acid','residual sugar','chlorides','free sulfur dioxide','total sulfur dioxide','density','pH','sulphates','alcohol']
 
 le = preprocessing.LabelEncoder()
 
 i = 0
-while i<len(samples_sizes):
-
-    whiteWine = pd.read_csv("/Users/markloughman/Desktop/winequality-white.csv", sep=";", nrows=samples_sizes[i])
-    
-    redWine = pd.read_csv("/Users/markloughman/Desktop/winequality-white.csv", sep=";", nrows=samples_sizes[i])
-
-    whiteX = whiteWine.loc[:, whiteWineFeatures]
-    whiteY = whiteWine.quality
-    
-    redX = redWine.loc[:, whiteWineFeatures]
-    redY = redWine.quality
-
-    lm = linear_model.LinearRegression(normalize=True)
-    rr = linear_model.Ridge(normalize=True)
-    lr = linear_model.LogisticRegression()
-    nn = neighbors.KNeighborsClassifier(len(samples_sizes))
-
-    kfold = KFold(n_splits=10,random_state=0)
-
-    NMSE_resultsWhiteWineLR = cross_val_score(lm, whiteX, whiteY, cv=10, scoring="neg_mean_squared_error")  # Choose another regression metric
-    NMSE_resultsWhiteWineLR = NMSE_resultsWhiteWineLR * -1
-    RMS_resultsWhiteWineLR = np.sqrt(NMSE_resultsWhiteWineLR)
-    RMS_resultsWhiteWineLR = normaliseScores(RMS_resultsWhiteWineLR)  # LINEAR REGRESSION WHITE WINE DATA SET
-    mean_errorWhiteWineLR = RMS_resultsWhiteWineLR.mean()
-    abs_mean_errorWhiteWineLR = cross_val_score(lm, whiteX, whiteY, cv=10, scoring="neg_mean_absolute_error")
-    abs_mean_errorWhiteWineLR = abs_mean_errorWhiteWineLR * -1
-    abs_mean_errorWhiteWineLR = normaliseScores(abs_mean_errorWhiteWineLR)
-    abs_mean_errorWhiteWineLR = abs_mean_errorWhiteWineLR.mean()
-    
-    NMSE_resultsRedWineLR = cross_val_score(lm, redX, redY, cv=10, scoring="neg_mean_squared_error")  # Choose another regression metric
-    NMSE_resultsRedWineLR = NMSE_resultsRedWineLR * -1
-    RMS_resultsRedWineLR = np.sqrt(NMSE_resultsRedWineLR)
-    RMS_resultsRedWineLR = normaliseScores(RMS_resultsRedWineLR)  # LINEAR REGRESSION Red WINE DATA SET
-    mean_errorRedWineLR = RMS_resultsRedWineLR.mean()
-    abs_mean_errorRedWineLR = cross_val_score(lm, redX, redY, cv=10, scoring="neg_mean_absolute_error")
-    abs_mean_errorRedWineLR = abs_mean_errorRedWineLR * -1
-    abs_mean_errorRedWineLR = normaliseScores(abs_mean_errorRedWineLR)
-    abs_mean_errorRedWineLR = abs_mean_errorRedWineLR.mean()
-    
-
-    NMSE_resultsWhiteWineRR = cross_val_score(rr, whiteX, whiteY, cv=10,scoring="neg_mean_squared_error")  # Choose another regression metric
-    NMSE_resultsWhiteWineRR = NMSE_resultsWhiteWineRR * -1
-    RMS_resultsWhiteWineRR = np.sqrt(NMSE_resultsWhiteWineRR)
-    RMS_resultsWhiteWineRR = normaliseScores(RMS_resultsWhiteWineRR)  # RIDGE REGRESSION WHITE WINE DATA SET
-    mean_errorWhiteWineRR = RMS_resultsWhiteWineRR.mean()
-    abs_mean_errorWhiteWineRR = cross_val_score(rr, whiteX, whiteY, cv=10, scoring="neg_mean_absolute_error")
-    abs_mean_errorWhiteWineRR = abs_mean_errorWhiteWineRR * -1
-    abs_mean_errorWhiteWineRR = normaliseScores(abs_mean_errorWhiteWineRR)
-    abs_mean_errorWhiteWineRR = abs_mean_errorWhiteWineRR.mean()
-    
-    NMSE_resultsRedWineRR = cross_val_score(rr, redX, redY, cv=10,scoring="neg_mean_squared_error")  # Choose another regression metric
-    NMSE_resultsRedWineRR = NMSE_resultsRedWineRR * -1
-    RMS_resultsRedWineRR = np.sqrt(NMSE_resultsRedWineRR)
-    RMS_resultsRedWineRR = normaliseScores(RMS_resultsRedWineRR)  # RIDGE REGRESSION Red WINE DATA SET
-    mean_errorRedWineRR = RMS_resultsRedWineRR.mean()
-    abs_mean_errorRedWineRR = cross_val_score(rr, redX, redY, cv=10, scoring="neg_mean_absolute_error")
-    abs_mean_errorRedWineRR = abs_mean_errorRedWineRR * -1
-    abs_mean_errorRedWineRR = normaliseScores(abs_mean_errorRedWineRR)
-    abs_mean_errorRedWineRR = abs_mean_errorRedWineRR.mean()
-
-    
-    ACC_resultsLogWhiteWine = cross_val_score(lr, whiteX, whiteY, cv=kfold, scoring="accuracy")
-    PREC_scorerLogWhiteWine = make_scorer(precision_score, average="weighted")
-    PREC_resultsLogWhiteWine = cross_val_score(lr, whiteX, whiteY, cv=kfold, scoring=PREC_scorerLogWhiteWine)  # LOGISTIC REGRESSION SUM WhiteWine NOISE
-    mean_ACCLogWhiteWine = ACC_resultsLogWhiteWine.mean()
-    mean_PRECLogWhiteWine = PREC_resultsLogWhiteWine.mean()
-
-    ACC_resultsLogRedWine = cross_val_score(lr, redX, redY, cv=kfold, scoring="accuracy")
-    PREC_scorerLogRedWine = make_scorer(precision_score, average="weighted")
-    PREC_resultsLogRedWine = cross_val_score(lr, redX, redY, cv=kfold,scoring=PREC_scorerLogRedWine)  # LOGISTIC REGRESSION SUM RedWine NOISE
-    mean_ACCLogRedWine = ACC_resultsLogRedWine.mean()
-    mean_PRECLogRedWine = PREC_resultsLogRedWine.mean()
 
 
-    ACC_resultsNnWhiteWine = cross_val_score(nn, whiteX, whiteY, cv=kfold, scoring="accuracy")
-    PREC_scorerNnWhiteWine = make_scorer(precision_score, average="weighted")
-    PREC_resultsNnWhiteWine = cross_val_score(nn, whiteX, whiteY, cv=kfold,scoring=PREC_scorerNnWhiteWine)  # NEAREST NEIGHBORS WHITE WINE DATA SET
-    mean_ACCNnWhiteWine = ACC_resultsNnWhiteWine.mean()
-    mean_PRECNnWhiteWine = PREC_resultsNnWhiteWine.mean()
+whiteWine = pd.read_csv("/Users/markloughman/Desktop/winequality-white.csv", sep=";", nrows=samples_sizes[i])
 
-    ACC_resultsNnRedWine = cross_val_score(nn, redX, redY, cv=kfold, scoring="accuracy")
-    PREC_scorerNnRedWine = make_scorer(precision_score, average="weighted")
-    PREC_resultsNnRedWine = cross_val_score(nn, redX, redY, cv=kfold, scoring=PREC_scorerNnRedWine)  # NEAREST NEIGHBORS Red WINE DATA SET
-    mean_ACCNnRedWine = ACC_resultsNnRedWine.mean()
-    mean_PRECNnRedWine = PREC_resultsNnRedWine.mean()
+redWine = pd.read_csv("/Users/markloughman/Desktop/winequality-white.csv", sep=";", nrows=samples_sizes[i])
 
-    encoder = LabelEncoder()
+whiteX = whiteWine.loc[:, whiteWineFeatures]
+whiteY = whiteWine.quality
+
+redX = redWine.loc[:, whiteWineFeatures]
+redY = redWine.quality
+
+lm = linear_model.LinearRegression(normalize=True)
+rr = linear_model.Ridge(normalize=True)
+lr = linear_model.LogisticRegression()
+nn = neighbors.KNeighborsClassifier(len(samples_sizes))
+
+kfold = KFold(n_splits=10,random_state=0)
+
+NMSE_resultsWhiteWineLR = cross_val_score(lm, whiteX, whiteY, cv=10, scoring="neg_mean_squared_error")  # Choose another regression metric
+NMSE_resultsWhiteWineLR = NMSE_resultsWhiteWineLR * -1
+RMS_resultsWhiteWineLR = np.sqrt(NMSE_resultsWhiteWineLR)
+RMS_resultsWhiteWineLR = normaliseScores(RMS_resultsWhiteWineLR)  # LINEAR REGRESSION WHITE WINE DATA SET
+mean_errorWhiteWineLR = RMS_resultsWhiteWineLR.mean()
+abs_mean_errorWhiteWineLR = cross_val_score(lm, whiteX, whiteY, cv=10, scoring="neg_mean_absolute_error")
+abs_mean_errorWhiteWineLR = abs_mean_errorWhiteWineLR * -1
+abs_mean_errorWhiteWineLR = normaliseScores(abs_mean_errorWhiteWineLR)
+abs_mean_errorWhiteWineLR = abs_mean_errorWhiteWineLR.mean()
+
+NMSE_resultsRedWineLR = cross_val_score(lm, redX, redY, cv=10, scoring="neg_mean_squared_error")  # Choose another regression metric
+NMSE_resultsRedWineLR = NMSE_resultsRedWineLR * -1
+RMS_resultsRedWineLR = np.sqrt(NMSE_resultsRedWineLR)
+RMS_resultsRedWineLR = normaliseScores(RMS_resultsRedWineLR)  # LINEAR REGRESSION Red WINE DATA SET
+mean_errorRedWineLR = RMS_resultsRedWineLR.mean()
+abs_mean_errorRedWineLR = cross_val_score(lm, redX, redY, cv=10, scoring="neg_mean_absolute_error")
+abs_mean_errorRedWineLR = abs_mean_errorRedWineLR * -1
+abs_mean_errorRedWineLR = normaliseScores(abs_mean_errorRedWineLR)
+abs_mean_errorRedWineLR = abs_mean_errorRedWineLR.mean()
 
 
-    print("Error with sample size of ", samples_sizes[i], "for mean squared error = ", mean_errorWhiteWineLR,
+NMSE_resultsWhiteWineRR = cross_val_score(rr, whiteX, whiteY, cv=10,scoring="neg_mean_squared_error")  # Choose another regression metric
+NMSE_resultsWhiteWineRR = NMSE_resultsWhiteWineRR * -1
+RMS_resultsWhiteWineRR = np.sqrt(NMSE_resultsWhiteWineRR)
+RMS_resultsWhiteWineRR = normaliseScores(RMS_resultsWhiteWineRR)  # RIDGE REGRESSION WHITE WINE DATA SET
+mean_errorWhiteWineRR = RMS_resultsWhiteWineRR.mean()
+abs_mean_errorWhiteWineRR = cross_val_score(rr, whiteX, whiteY, cv=10, scoring="neg_mean_absolute_error")
+abs_mean_errorWhiteWineRR = abs_mean_errorWhiteWineRR * -1
+abs_mean_errorWhiteWineRR = normaliseScores(abs_mean_errorWhiteWineRR)
+abs_mean_errorWhiteWineRR = abs_mean_errorWhiteWineRR.mean()
+
+NMSE_resultsRedWineRR = cross_val_score(rr, redX, redY, cv=10,scoring="neg_mean_squared_error")  # Choose another regression metric
+NMSE_resultsRedWineRR = NMSE_resultsRedWineRR * -1
+RMS_resultsRedWineRR = np.sqrt(NMSE_resultsRedWineRR)
+RMS_resultsRedWineRR = normaliseScores(RMS_resultsRedWineRR)  # RIDGE REGRESSION Red WINE DATA SET
+mean_errorRedWineRR = RMS_resultsRedWineRR.mean()
+abs_mean_errorRedWineRR = cross_val_score(rr, redX, redY, cv=10, scoring="neg_mean_absolute_error")
+abs_mean_errorRedWineRR = abs_mean_errorRedWineRR * -1
+abs_mean_errorRedWineRR = normaliseScores(abs_mean_errorRedWineRR)
+abs_mean_errorRedWineRR = abs_mean_errorRedWineRR.mean()
+
+
+ACC_resultsLogWhiteWine = cross_val_score(lr, whiteX, whiteY, cv=kfold, scoring="accuracy")
+PREC_scorerLogWhiteWine = make_scorer(precision_score, average="weighted")
+PREC_resultsLogWhiteWine = cross_val_score(lr, whiteX, whiteY, cv=kfold, scoring=PREC_scorerLogWhiteWine)  # LOGISTIC REGRESSION SUM WhiteWine NOISE
+mean_ACCLogWhiteWine = ACC_resultsLogWhiteWine.mean()
+mean_PRECLogWhiteWine = PREC_resultsLogWhiteWine.mean()
+
+ACC_resultsLogRedWine = cross_val_score(lr, redX, redY, cv=kfold, scoring="accuracy")
+PREC_scorerLogRedWine = make_scorer(precision_score, average="weighted")
+PREC_resultsLogRedWine = cross_val_score(lr, redX, redY, cv=kfold,scoring=PREC_scorerLogRedWine)  # LOGISTIC REGRESSION SUM RedWine NOISE
+mean_ACCLogRedWine = ACC_resultsLogRedWine.mean()
+mean_PRECLogRedWine = PREC_resultsLogRedWine.mean()
+
+
+ACC_resultsNnWhiteWine = cross_val_score(nn, whiteX, whiteY, cv=kfold, scoring="accuracy")
+PREC_scorerNnWhiteWine = make_scorer(precision_score, average="weighted")
+PREC_resultsNnWhiteWine = cross_val_score(nn, whiteX, whiteY, cv=kfold,scoring=PREC_scorerNnWhiteWine)  # NEAREST NEIGHBORS WHITE WINE DATA SET
+mean_ACCNnWhiteWine = ACC_resultsNnWhiteWine.mean()
+mean_PRECNnWhiteWine = PREC_resultsNnWhiteWine.mean()
+
+ACC_resultsNnRedWine = cross_val_score(nn, redX, redY, cv=kfold, scoring="accuracy")
+PREC_scorerNnRedWine = make_scorer(precision_score, average="weighted")
+PREC_resultsNnRedWine = cross_val_score(nn, redX, redY, cv=kfold, scoring=PREC_scorerNnRedWine)  # NEAREST NEIGHBORS Red WINE DATA SET
+mean_ACCNnRedWine = ACC_resultsNnRedWine.mean()
+mean_PRECNnRedWine = PREC_resultsNnRedWine.mean()
+
+encoder = LabelEncoder()
+
+
+print("Error with sample size of for mean squared error = ", mean_errorWhiteWineLR,
           "for the White Wine Data Set - Linear Regression")
-    print("Error with sample size of ", samples_sizes[i], "for absolute mean error =", abs_mean_errorWhiteWineLR,
+print("Error with sample size of for absolute mean error =", abs_mean_errorWhiteWineLR,
           "for the White Wine Data Set - Linear Regression")
-    
-    print("Error with sample size of ", samples_sizes[i], "for mean squared error = ", mean_errorRedWineLR,
+
+print("Error with sample size of for mean squared error = ", mean_errorRedWineLR,
           "for the Red Wine Data Set - Linear Regression")
-    print("Error with sample size of ", samples_sizes[i], "for absolute mean error =", abs_mean_errorRedWineLR,
+print("Error with sample size of for absolute mean error =", abs_mean_errorRedWineLR,
           "for the Red Wine Data Set - Linear Regression")
 
-    print("Error with sample size of ", samples_sizes[i], "for mean squared error = ", mean_errorWhiteWineRR,
+print("Error with sample size of for mean squared error = ", mean_errorWhiteWineRR,
           "for the White Wine Data Set - Ridge Regression")
-    print("Error with sample size of ", samples_sizes[i], "for absolute mean error =", abs_mean_errorWhiteWineRR,
+print("Error with sample size of for absolute mean error =", abs_mean_errorWhiteWineRR,
           "for the White Wine Data Set - Ridge Regression")
-    
-    print("Error with sample size of ", samples_sizes[i], "for mean squared error = ", mean_errorRedWineRR,
+
+print("Error with sample size of for mean squared error = ", mean_errorRedWineRR,
           "for the Red Wine Data Set - Ridge Regression")
-    print("Error with sample size of ", samples_sizes[i], "for absolute mean error =", abs_mean_errorRedWineRR,
+print("Error with sample size of for absolute mean error =", abs_mean_errorRedWineRR,
           "for the Red Wine Data Set - Ridge Regression")
 
-    print("Accuracy with sample of size of ", samples_sizes[i], " = ", mean_ACCLogWhiteWine,
+print("Accuracy with sample of size of = ", mean_ACCLogWhiteWine,
           " for the White Wine Data Set - Logstic Regression")
-    print("Precision Score with sample of size of ", samples_sizes[i], " = ", mean_PRECLogWhiteWine,
+print("Precision Score with sample of size of = ", mean_PRECLogWhiteWine,
           "for the White Wine Data Set - Logistic Regression")
-    
-    print("Accuracy with sample of size of ", samples_sizes[i], " = ", mean_ACCLogRedWine,
+
+print("Accuracy with sample of size of = ", mean_ACCLogRedWine,
           " for the Red Wine Data Set - Logstic Regression")
-    print("Precision Score with sample of size of ", samples_sizes[i], " = ", mean_PRECLogRedWine,
+print("Precision Score with sample of size of = ", mean_PRECLogRedWine,
           "for the Red Wine Data Set - Logistic Regression")
 
-    print("Accuracy with sample of size of ", samples_sizes[i], " = ", mean_ACCNnWhiteWine,
+print("Accuracy with sample of size of = ", mean_ACCNnWhiteWine,
           " for the White Wine Data Set - Nearest Neighbors")
-    print("Precision Score with sample of size of ", samples_sizes[i], " = ", mean_PRECNnWhiteWine,
+print("Precision Score with sample of size of = ", mean_PRECNnWhiteWine,
           " for the White Wine Data Set - Nearest Neighbors")
 
-    print("Accuracy with sample of size of ", samples_sizes[i], " = ", mean_ACCNnRedWine,
+print("Accuracy with sample of size of = ", mean_ACCNnRedWine,
           " for the Red Wine Data Set - Nearest Neighbors")
-    print("Precision Score with sample of size of ", samples_sizes[i], " = ", mean_PRECNnRedWine,
+print("Precision Score = ", mean_PRECNnRedWine,
           " for the Red Wine Data Set - Nearest Neighbors")
-
-
-    i += 1
