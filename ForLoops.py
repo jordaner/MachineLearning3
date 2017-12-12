@@ -32,29 +32,64 @@ def featureSelect(X, Y, i):
 
 def executeAlgorithms(X, y):
     # These won't work as the evaluation metris are set up for classification not regression
-    # print("--- LinearRegression ---")
-    # model = linear_model.LinearRegression(normalize=True)
-    # model = model.fit(X, y)
-    # metricEvaluation(model, X, y)
-    #
-    # print("--- Ridge Regression ---")
-    # model = linear_model.Ridge(normalize = True)
-    # model = model.fit(X, y)
-    # metricEvaluation(model, X, y)
-    #
-    print("--- Nearest Neighbors ---")
-    model = neighbors.KNeighborsClassifier(5)
+    print("--- LinearRegression ---")
+    model = linear_model.LinearRegression(normalize=True)
     model = model.fit(X, y)
-    metricEvaluation(model, X, y)
+    regMetricEvaluation(model, X, y)
+
+    print("--- Ridge Regression ---")
+    model = linear_model.Ridge(normalize = True)
+    model = model.fit(X, y)
+    regMetricEvaluation(model, X, y)
+
+    print("--- Nearest Neighbors ---")
+    model = neighbors.KNeighborsClassifier()
+    model = model.fit(X, y)
+    classMetricEvaluation(model, X, y)
 
     print("--- Logistic Regression ---")
     model = linear_model.LogisticRegression()
     model = model.fit(X, y)
-    metricEvaluation(model, X, y)
+    classMetricEvaluation(model, X, y)
 
     return
 
-def metricEvaluation(model, X, y):
+def regMetricEvaluation(model, X, y):
+    # RMS Error
+    mean_squared_error = cross_val_score(model, X, y, cv=10, scoring="neg_mean_squared_error") * -1
+    mean_squared_error = normaliseScores(mean_squared_error)
+    root_mean_squared_error = np.sqrt(mean_squared_error)
+    # Absoulte mean error
+    abs_mean_error = cross_val_score(model, X, y, cv=10, scoring="neg_mean_absolute_error") * -1
+    abs_mean_error = normaliseScores(abs_mean_error)
+    # R2 score
+    r2_score = cross_val_score(model, X, y, cv=10, scoring="r2")
+    r2_score = normaliseScores(r2_score)
+    # Median absolute error
+    median_absolute_error = cross_val_score(model, X, y, cv=10, scoring="neg_median_absolute_error") * -1
+    median_absolute_error = normaliseScores(median_absolute_error)
+    # Mean squared log error
+    mean_squared_log_error = cross_val_score(model, X, y, cv=10, scoring="neg_mean_squared_log_error") * -1
+    mean_squared_log_error = normaliseScores(mean_squared_log_error)
+
+    # Runtime metric
+    # start_time = time.time()
+    # cross_val_score(model, X, y, cv=10)
+    # runtime = time.time() - start_time
+    # print("Runtime                =", runtime)
+    print("Mean squared log error            =", mean_squared_log_error.mean())
+    print("Median absolute error             =", median_absolute_error.mean())
+    print("R2 score                          =", r2_score.mean())
+    print("RMS error                         =", root_mean_squared_error.mean())
+    print("Absolute mean error               =", abs_mean_error.mean())
+    # print("Absolute mean error per unit time =", (abs_mean_error.mean()/runtime))
+
+    # times.insert(0, runtime)
+    # errorPerUnitTime.insert(0, abs_mean_error.mean()/runtime)
+
+    return
+
+def classMetricEvaluation(model, X, y):
     accuracy_result = cross_val_score(model, X, y, cv=10, scoring="accuracy")
     f1_weighted_result = cross_val_score(model, X, y, cv=10, scoring="f1_weighted")
     f1_micro_result = cross_val_score(model, X, y, cv=10, scoring="f1_micro")
