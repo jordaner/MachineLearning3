@@ -26,8 +26,8 @@ def scaleData(unscaledData):
     scaledData = preprocessing.scale(unscaledData)
     return scaledData;
 
-def featureSelect(X, Y):
-    X_new = SelectKBest(chi2, k=10).fit_transform(X,Y)
+def featureSelect(X, Y, i):
+    X_new = SelectKBest(chi2, k=i).fit_transform(X,Y)
     return X_new
 
 def executeAlgorithms(X, y):
@@ -124,8 +124,12 @@ dataframe = pd.read_csv("/home/eric/Desktop/4th Year/MachineLearning/Assignment3
 X = dataframe.loc[:, Features]
 y = dataframe.quality
 
-X = featureSelect(X, y);
-X = scaleData(X);
+i = 11
 
+while i > 0 :
+    Xs = featureSelect(X, y, i);
+    Xs = scaleData(Xs);
 
-executeAlgorithms(X, y)
+    print("------ Training with",i,"features ------")
+    executeAlgorithms(Xs, y)
+    i -= 1
