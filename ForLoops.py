@@ -147,7 +147,7 @@ def classMetricEvaluation(model, X, y):
     return
 
 ### Added to suppress warnings for ill-defined precision, should be removed if other issues arise
-warnings.filterwarnings("ignore")
+#warnings.filterwarnings("ignore")
 
 Features = ['fixed acidity','volatile acidity','citric acid','residual sugar','chlorides','free sulfur dioxide','total sulfur dioxide','density','pH','sulphates','alcohol']
 #
@@ -155,9 +155,19 @@ Features = ['fixed acidity','volatile acidity','citric acid','residual sugar','c
 # redWine = pd.read_csv("/Users/markloughman/Desktop/winequality-white.csv", sep=";")
 
 print("----- winequality-red -----")
-dataframe = pd.read_csv("/home/eric/Desktop/4th Year/MachineLearning/Assignment3/Wine/winequality-red.csv", sep=";")
+dataframe = pd.read_csv("/home/eric/Desktop/4th Year/MachineLearning/Assignment3/Wine/winequality-white.csv", sep=";")
 X = dataframe.loc[:, Features]
 y = dataframe.quality
+
+# clf = neighbors.LocalOutlierFactor(n_neighbors=20)
+# y_pred = clf.fit_predict(X)
+# y_pred_outliers = y_pred
+# count = 0
+# for i in range(len(y_pred_outliers)):
+#     if y_pred_outliers[i] == -1:
+#         count += 1
+# print(count)
+# print(len(y)-count)
 
 i = 11
 
