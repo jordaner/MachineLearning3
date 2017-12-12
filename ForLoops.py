@@ -9,6 +9,8 @@ from sklearn.metrics import mean_absolute_error, precision_score
 from sklearn.preprocessing import LabelEncoder
 from sklearn import preprocessing, neighbors
 from sklearn.metrics import accuracy_score
+from sklearn.feature_selection import SelectKBest
+from sklearn.feature_selection import chi2
 
 def normaliseScores(scores):
     old_max = max(scores)
@@ -18,6 +20,14 @@ def normaliseScores(scores):
     new_max = 1
     normalised_scores = np.array([(new_min + (((x-old_min)*(new_max-new_min)))/(old_max - old_min)) for x in scores])
     return normalised_scores
+
+def scaleData(unscaledData):
+    scaledData = preprocessing.scale(unscaledData)
+    return scaledData;
+
+def featureSelect(X, Y):
+    X_new = SelectKBest(chi2, k=10).fit_transform(X,Y)
+    return X_new
 
 def executeAlgorithms(X, y):
     # These won't work as the evaluation metris are set up for classification not regression
@@ -88,8 +98,12 @@ Features = ['fixed acidity','volatile acidity','citric acid','residual sugar','c
 # redWine = pd.read_csv("/Users/markloughman/Desktop/winequality-white.csv", sep=";")
 
 print("----- winequality-red -----")
-dataframe = pd.read_csv("~/Desktop/Python/winequality-red.csv", sep=";")
+dataframe = pd.read_csv("/Users/markloughman/Desktop/winequality-red.csv", sep=";")
 X = dataframe.loc[:, Features]
 y = dataframe.quality
+
+X = featureSelect(X, y);
+X = scaleData(X);
+
 
 executeAlgorithms(X, y)

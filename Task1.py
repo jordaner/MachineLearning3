@@ -40,7 +40,7 @@ def scaleData(unscaledData):
     return scaledData;
 
 def featureSelect(X, Y):
-    X_new = SelectKBest(chi2, k=4).fit_transform(X,Y)
+    X_new = SelectKBest(chi2, k=10).fit_transform(X,Y)
     return X_new
 
 
