@@ -74,6 +74,8 @@ def metricEvaluation(model, X, y):
     times.insert(0, runtime)
     errorPerUnitTime.insert(0, abs_mean_error.mean()/runtime)
 
+    return
+
 
 def trans_col(column):
     trans_list = LabelEncoder().fit_transform(column.tolist())
