@@ -5,13 +5,14 @@ from sklearn.metrics import mean_squared_error, r2_score
 import pandas as pd
 import scipy as sp
 from sklearn.metrics import mean_squared_log_error, make_scorer
-from sklearn.metrics import mean_absolute_error, precision_score, f1_score
+from sklearn.metrics import mean_absolute_error, precision_score, f1_score,median_absolute_error,mean_squared_log_error
 from sklearn.preprocessing import LabelEncoder
 from sklearn import preprocessing, neighbors
 from sklearn.metrics import accuracy_score
 from sklearn.feature_selection import SelectKBest
 from sklearn.feature_selection import chi2
 import warnings
+import math
 
 def normaliseScores(scores):
     old_max = max(scores)
@@ -30,17 +31,28 @@ def featureSelect(X, Y, i):
     X_new = SelectKBest(chi2, k=i).fit_transform(X,Y)
     return X_new
 
-def executeAlgorithms(X, y):
-    # These won't work as the evaluation metris are set up for classification not regression
+def executeRegression(X, y):
     print("--- LinearRegression ---")
     model = linear_model.LinearRegression(normalize=True)
-    model = model.fit(X, y)
+    # model = model.fit(X, y)
     regMetricEvaluation(model, X, y)
 
     print("--- Ridge Regression ---")
     model = linear_model.Ridge(normalize = True)
-    model = model.fit(X, y)
+    # model = model.fit(X, y)
     regMetricEvaluation(model, X, y)
+
+def executeClassification(X, y):
+    # These won't work as the evaluation metris are set up for classification not regression
+    # print("--- LinearRegression ---")
+    # model = linear_model.LinearRegression(normalize=True)
+    # model = model.fit(X, y)
+    # regMetricEvaluation(model, X, y)
+    #
+    # print("--- Ridge Regression ---")
+    # model = linear_model.Ridge(normalize = True)
+    # model = model.fit(X, y)
+    # regMetricEvaluation(model, X, y)
 
     print("--- Nearest Neighbors ---")
     model = neighbors.KNeighborsClassifier()
@@ -57,20 +69,20 @@ def executeAlgorithms(X, y):
 def regMetricEvaluation(model, X, y):
     # RMS Error
     mean_squared_error = cross_val_score(model, X, y, cv=10, scoring="neg_mean_squared_error") * -1
-    mean_squared_error = normaliseScores(mean_squared_error)
+    # mean_squared_error = normaliseScores(mean_squared_error)
     root_mean_squared_error = np.sqrt(mean_squared_error)
     # Absoulte mean error
     abs_mean_error = cross_val_score(model, X, y, cv=10, scoring="neg_mean_absolute_error") * -1
-    abs_mean_error = normaliseScores(abs_mean_error)
-    # R2 score
+    # abs_mean_error = normaliseScores(abs_mean_error)
+    # # R2 score
     r2_score = cross_val_score(model, X, y, cv=10, scoring="r2")
-    r2_score = normaliseScores(r2_score)
-    # Median absolute error
+    # r2_score = normaliseScores(r2_score)
+    # # Median absolute error
     median_absolute_error = cross_val_score(model, X, y, cv=10, scoring="neg_median_absolute_error") * -1
-    median_absolute_error = normaliseScores(median_absolute_error)
-    # Mean squared log error
+    # median_absolute_error = normaliseScores(median_absolute_error)
+    # # Mean squared log error
     mean_squared_log_error = cross_val_score(model, X, y, cv=10, scoring="neg_mean_squared_log_error") * -1
-    mean_squared_log_error = normaliseScores(mean_squared_log_error)
+    # mean_squared_log_error = normaliseScores(mean_squared_log_error)
 
     # Runtime metric
     # start_time = time.time()
@@ -145,16 +157,44 @@ def classMetricEvaluation(model, X, y):
     # errorPerUnitTime.insert(0, abs_mean_error.mean()/runtime)
 
     return
+def trainTestReg(X, y):
+    wine_X_train = X[:-20]
+    wine_X_test = X[-20:]
+    wine_y_train = y[:-20]
+    wine_y_test = y[-20:]
+
+    print("--- LinearRegression ---")
+    linReg = linear_model.LinearRegression(normalize=True)
+    linReg = linReg.fit(wine_X_train, wine_y_train)
+    y_pred = linReg.predict(wine_X_test)
+    metricsTT(wine_y_test,y_pred)
+
+    print("--- Ridge Regression ---")
+    rReg = linear_model.Ridge(normalize = True)
+    rReg = rReg.fit(X, y)
+    y_pred = rReg.predict(wine_X_test)
+    metricsTT(wine_y_test,y_pred)
+
+    return
+
+def metricsTT(test,prediction):
+    print("Root mean squared error           =",math.sqrt(mean_squared_error(test, prediction)))
+    print("Variance score                    =", r2_score(test, prediction))
+    print("Absolute mean error               =", mean_absolute_error(test,prediction))
+    print("Median absolute error             =", median_absolute_error(test,prediction))
+    print("Root mean squared log error       =", math.sqrt(mean_squared_log_error(test,prediction)))
+
+    return
 
 ### Added to suppress warnings for ill-defined precision, should be removed if other issues arise
-#warnings.filterwarnings("ignore")
+warnings.filterwarnings("ignore")
 
 Features = ['fixed acidity','volatile acidity','citric acid','residual sugar','chlorides','free sulfur dioxide','total sulfur dioxide','density','pH','sulphates','alcohol']
 #
 # whiteWine = pd.read_csv("~/Desktop/Python/ML3/", sep=";")
 # redWine = pd.read_csv("/Users/markloughman/Desktop/winequality-white.csv", sep=";")
 
-print("----- winequality-red -----")
+print("----- winequality-white -----")
 dataframe = pd.read_csv("/home/eric/Desktop/4th Year/MachineLearning/Assignment3/Wine/winequality-white.csv", sep=";")
 X = dataframe.loc[:, Features]
 y = dataframe.quality
@@ -171,10 +211,32 @@ y = dataframe.quality
 
 i = 11
 
+print("----- winequality-white -----")
+Features = ['fixed acidity','volatile acidity','citric acid','residual sugar','chlorides',
+            'free sulfur dioxide','total sulfur dioxide','density','pH','sulphates','alcohol']
+df = pd.read_csv("/Users/markloughman/Desktop/winequality-white.csv", sep=";")
+X = df.loc[:, Features]
+y = df.quality
+outliers_fraction = 0.01
+nu_estimate = 0.95 * outliers_fraction + 0.05
+auto_detection = svm.OneClassSVM(kernel = "rbf", gamma = 0.01, degree = 3, nu = nu_estimate)
+auto_detection.fit(X)
+evaluation = auto_detection.predict(X)
+dataframe = df[evaluation==1]
+X = dataframe.loc[:, Features]
+y = dataframe.quality
+print(dataframe)
+
+print("-------- Regression Algorithms --------")
 while i > 0 :
     Xs = featureSelect(X, y, i);
     Xs = scaleData(Xs);
 
     print("------ Training with",i,"features ------")
-    executeAlgorithms(Xs, y)
+    print("----- Cross_Val Regression -----")
+    executeRegression(Xs, y)
+    print("----- Traint_Test Regression -----")
+    trainTestReg(Xs,y)
+    # executeClassification(Xs, y)
     i -= 1
+i = 11
