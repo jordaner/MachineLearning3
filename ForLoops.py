@@ -34,7 +34,7 @@ def featureSelect(X, Y, i):
     return X_new
 
 def executeRegression(X, y):
-    # print("--- LinearRegression ---")
+    print("--- LinearRegression ---")
     model = linear_model.LinearRegression()
     # model = model.fit(X, y)
     regMetricEvaluation(model, X, y)
@@ -86,13 +86,16 @@ def regMetricEvaluation(model, X, y):
     mean_squared_log_error = cross_val_score(model, X, y, cv=10, scoring="neg_mean_squared_log_error") * -1
     # mean_squared_log_error = normaliseScores(mean_squared_log_error)
 
-    print(math.sqrt(mean_squared_log_error.mean()),",",median_absolute_error.mean(),",",r2_score.mean(),",",root_mean_squared_error.mean(),",",abs_mean_error.mean(),",")
+    print(math.sqrt(mean_squared_log_error.mean()))
+    print(median_absolute_error.mean())
+    print(r2_score.mean())
+    print(root_mean_squared_error.mean())
+    print(abs_mean_error.mean())
 
-    # "Root mean squared log error       =",
-    # "Median absolute error             =",
-    # "R2 score                          =",
-    # "RMS error                         =",
-    # "Absolute mean error               =",
+    "Median absolute error             =",
+    "R2 score                          =",
+    "RMS error                         =",
+    "Absolute mean error               =",
 
     return
 
@@ -186,8 +189,8 @@ def metricsTT(test,prediction):
 
 ### Added to suppress warnings for ill-defined precision, should be removed if other issues arise
 warnings.filterwarnings("ignore")
-f = open("results.txt", 'w')
-sys.stdout = f
+# f = open("results.txt", 'w')
+# sys.stdout = f
 #
 # whiteWine = pd.read_csv("~/Desktop/Python/ML3/", sep=";")
 # redWine = pd.read_csv("/Users/markloughman/Desktop/winequality-white.csv", sep=";")
@@ -222,8 +225,8 @@ dataframe = df[evaluation==1]
 X2 = dataframe.loc[:, Features]
 y2 = dataframe.quality
 # print(dataframe)
-print("----- Cross_Val Regression with outliers -----")
-print("--- LinearRegression ---")
+
+# print("--- LinearRegression ---")
 
 # print("-------- Regression Algorithms --------")
 while i > 0 :
@@ -233,11 +236,11 @@ while i > 0 :
     Xs2 = featureSelect(X2, y2, i)
     Xs2 = scaleData(Xs2)
 
-    # print("------ Training with",i,"features ------")
-    # print("----- Cross_Val Regression with outliers -----")
+    print("------ Training with",i,"features ------")
+    print("----- Cross_Val Regression with outliers -----")
     executeRegression(Xs, y)
-    # print("----- Cross_Val Regression outliers removed -----")
-    # executeRegression(Xs2, y2)
+    print("----- Cross_Val Regression outliers removed -----")
+    executeRegression(Xs2, y2)
     #
     # print("----- Traint_Test Regression -----")
     # trainTestReg(Xs,y)
