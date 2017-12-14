@@ -13,6 +13,7 @@ from sklearn.feature_selection import SelectKBest
 from sklearn.feature_selection import chi2
 import warnings
 import math
+import sys
 from sklearn import svm
 
 def normaliseScores(scores):
@@ -33,15 +34,15 @@ def featureSelect(X, Y, i):
     return X_new
 
 def executeRegression(X, y):
-    print("--- LinearRegression ---")
-    model = linear_model.LinearRegression(normalize=True)
+    # print("--- LinearRegression ---")
+    model = linear_model.LinearRegression()
     # model = model.fit(X, y)
     regMetricEvaluation(model, X, y)
 
-    print("--- Ridge Regression ---")
-    model = linear_model.Ridge(normalize = True)
-    # model = model.fit(X, y)
-    regMetricEvaluation(model, X, y)
+    # print("--- Ridge Regression ---")
+    # model = linear_model.Ridge( )
+    # # model = model.fit(X, y)
+    # regMetricEvaluation(model, X, y)
 
 def executeClassification(X, y):
     # These won't work as the evaluation metris are set up for classification not regression
@@ -57,12 +58,12 @@ def executeClassification(X, y):
 
     print("--- Nearest Neighbors ---")
     model = neighbors.KNeighborsClassifier()
-    model = model.fit(X, y)
+    # model = model.fit(X, y)
     classMetricEvaluation(model, X, y)
 
     print("--- Logistic Regression ---")
     model = linear_model.LogisticRegression()
-    model = model.fit(X, y)
+    # model = model.fit(X, y)
     classMetricEvaluation(model, X, y)
 
     return
@@ -85,20 +86,13 @@ def regMetricEvaluation(model, X, y):
     mean_squared_log_error = cross_val_score(model, X, y, cv=10, scoring="neg_mean_squared_log_error") * -1
     # mean_squared_log_error = normaliseScores(mean_squared_log_error)
 
-    # Runtime metric
-    # start_time = time.time()
-    # cross_val_score(model, X, y, cv=10)
-    # runtime = time.time() - start_time
-    # print("Runtime                =", runtime)
-    print("Mean squared log error            =", mean_squared_log_error.mean())
-    print("Median absolute error             =", median_absolute_error.mean())
-    print("R2 score                          =", r2_score.mean())
-    print("RMS error                         =", root_mean_squared_error.mean())
-    print("Absolute mean error               =", abs_mean_error.mean())
-    # print("Absolute mean error per unit time =", (abs_mean_error.mean()/runtime))
+    print(math.sqrt(mean_squared_log_error.mean()),",",median_absolute_error.mean(),",",r2_score.mean(),",",root_mean_squared_error.mean(),",",abs_mean_error.mean(),",")
 
-    # times.insert(0, runtime)
-    # errorPerUnitTime.insert(0, abs_mean_error.mean()/runtime)
+    # "Root mean squared log error       =",
+    # "Median absolute error             =",
+    # "R2 score                          =",
+    # "RMS error                         =",
+    # "Absolute mean error               =",
 
     return
 
@@ -178,18 +172,22 @@ def trainTestReg(X, y):
 
     return
 
+def wait():
+    input("Press enter to continue...")
+
 def metricsTT(test,prediction):
-    print("Root mean squared error           =",math.sqrt(mean_squared_error(test, prediction)))
-    print("Variance score                    =", r2_score(test, prediction))
-    print("Absolute mean error               =", mean_absolute_error(test,prediction))
-    print("Median absolute error             =", median_absolute_error(test,prediction))
     print("Root mean squared log error       =", math.sqrt(mean_squared_log_error(test,prediction)))
+    print("Median absolute error             =", median_absolute_error(test,prediction))
+    print("R2 score                          =", r2_score(test, prediction))
+    print("RMS error                         =", math.sqrt(mean_squared_error(test, prediction)))
+    print("Absolute mean error               =", mean_absolute_error(test,prediction))
 
     return
 
 ### Added to suppress warnings for ill-defined precision, should be removed if other issues arise
 warnings.filterwarnings("ignore")
-
+f = open("results.txt", 'w')
+sys.stdout = f
 #
 # whiteWine = pd.read_csv("~/Desktop/Python/ML3/", sep=";")
 # redWine = pd.read_csv("/Users/markloughman/Desktop/winequality-white.csv", sep=";")
@@ -212,7 +210,7 @@ print("----- winequality-white -----")
 Features = ['fixed acidity','volatile acidity','citric acid','residual sugar','chlorides',
             'free sulfur dioxide','total sulfur dioxide','density','pH','sulphates','alcohol']
 
-df = pd.read_csv("/Users/markloughman/Desktop/winequality-white.csv", sep=";")
+df = pd.read_csv("/home/eric/Desktop/4th Year/MachineLearning/Assignment3/Wine/winequality-red.csv", sep=";")
 X = df.loc[:, Features]
 y = df.quality
 outliers_fraction = 0.01
@@ -223,9 +221,11 @@ evaluation = auto_detection.predict(X)
 dataframe = df[evaluation==1]
 X2 = dataframe.loc[:, Features]
 y2 = dataframe.quality
-print(dataframe)
+# print(dataframe)
+print("----- Cross_Val Regression with outliers -----")
+print("--- LinearRegression ---")
 
-print("-------- Regression Algorithms --------")
+# print("-------- Regression Algorithms --------")
 while i > 0 :
     Xs = featureSelect(X, y, i)
     Xs = scaleData(Xs)
@@ -233,18 +233,17 @@ while i > 0 :
     Xs2 = featureSelect(X2, y2, i)
     Xs2 = scaleData(Xs2)
 
-    print("------ Training with",i,"features ------")
-    print("----- Cross_Val Regression -----")
+    # print("------ Training with",i,"features ------")
+    # print("----- Cross_Val Regression with outliers -----")
     executeRegression(Xs, y)
-    print("----- Cross_Val Regression outliers removed -----")
-    executeRegression(Xs2, y2)
+    # print("----- Cross_Val Regression outliers removed -----")
+    # executeRegression(Xs2, y2)
+    #
+    # print("----- Traint_Test Regression -----")
+    # trainTestReg(Xs,y)
+    # print("----- Traint_Test Regression outliers removed -----")
+    # trainTestReg(Xs2,y2)
 
-    print("----- Traint_Test Regression -----")
-    trainTestReg(Xs,y)
-    executeClassification(Xs, y)
-
-    print("----- Traint_Test Regression outliers removed -----")
-    trainTestReg(Xs2, y2)
-    executeClassification(Xs2, y2)
+    # print("----- Cross val Classification outliers removed -----")
+    # executeClassification(Xs2, y2)
     i -= 1
-i = 11
