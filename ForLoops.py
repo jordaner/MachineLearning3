@@ -39,10 +39,10 @@ def executeRegression(X, y):
     # model = model.fit(X, y)
     regMetricEvaluation(model, X, y)
 
-    # print("--- Ridge Regression ---")
-    # model = linear_model.Ridge( )
-    # # model = model.fit(X, y)
-    # regMetricEvaluation(model, X, y)
+    print("--- Ridge Regression ---")
+    model = linear_model.Ridge()
+    # model = model.fit(X, y)
+    regMetricEvaluation(model, X, y)
 
 def executeClassification(X, y):
     # These won't work as the evaluation metris are set up for classification not regression
@@ -92,10 +92,10 @@ def regMetricEvaluation(model, X, y):
     print(root_mean_squared_error.mean())
     print(abs_mean_error.mean())
 
-    "Median absolute error             =",
-    "R2 score                          =",
-    "RMS error                         =",
-    "Absolute mean error               =",
+    # "Median absolute error             =",
+    # "R2 score                          =",
+    # "RMS error                         =",
+    # "Absolute mean error               =",
 
     return
 
@@ -162,13 +162,13 @@ def trainTestReg(X, y):
     wine_y_test = y[-20:]
 
     print("--- LinearRegression ---")
-    linReg = linear_model.LinearRegression(normalize=True)
+    linReg = linear_model.LinearRegression()
     linReg = linReg.fit(wine_X_train, wine_y_train)
     y_pred = linReg.predict(wine_X_test)
     metricsTT(wine_y_test,y_pred)
 
     print("--- Ridge Regression ---")
-    rReg = linear_model.Ridge(normalize = True)
+    rReg = linear_model.Ridge()
     rReg = rReg.fit(X, y)
     y_pred = rReg.predict(wine_X_test)
     metricsTT(wine_y_test,y_pred)
