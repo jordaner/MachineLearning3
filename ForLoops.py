@@ -26,7 +26,7 @@ def normaliseScores(scores):
 
 def scaleData(unscaledData):
     scaledData = preprocessing.scale(unscaledData)
-    return scaledData;
+    return scaledData
 
 def featureSelect(X, Y, i):
     X_new = SelectKBest(chi2, k=i).fit_transform(X,Y)
@@ -211,6 +211,7 @@ i = 11
 print("----- winequality-white -----")
 Features = ['fixed acidity','volatile acidity','citric acid','residual sugar','chlorides',
             'free sulfur dioxide','total sulfur dioxide','density','pH','sulphates','alcohol']
+
 df = pd.read_csv("/Users/markloughman/Desktop/winequality-white.csv", sep=";")
 X = df.loc[:, Features]
 y = df.quality
@@ -220,20 +221,30 @@ auto_detection = svm.OneClassSVM(kernel = "rbf", gamma = 0.01, degree = 3, nu = 
 auto_detection.fit(X)
 evaluation = auto_detection.predict(X)
 dataframe = df[evaluation==1]
-X = dataframe.loc[:, Features]
-y = dataframe.quality
+X2 = dataframe.loc[:, Features]
+y2 = dataframe.quality
 print(dataframe)
 
 print("-------- Regression Algorithms --------")
 while i > 0 :
-    Xs = featureSelect(X, y, i);
-    Xs = scaleData(Xs);
+    Xs = featureSelect(X, y, i)
+    Xs = scaleData(Xs)
+
+    Xs2 = featureSelect(X2, y2, i)
+    Xs2 = scaleData(Xs2)
 
     print("------ Training with",i,"features ------")
     print("----- Cross_Val Regression -----")
     executeRegression(Xs, y)
+    print("----- Cross_Val Regression outliers removed -----")
+    executeRegression(Xs2, y2)
+
     print("----- Traint_Test Regression -----")
     trainTestReg(Xs,y)
     executeClassification(Xs, y)
+
+    print("----- Traint_Test Regression outliers removed -----")
+    trainTestReg(Xs2, y2)
+    executeClassification(Xs2, y2)
     i -= 1
 i = 11
