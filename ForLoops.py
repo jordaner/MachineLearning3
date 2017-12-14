@@ -13,6 +13,7 @@ from sklearn.feature_selection import SelectKBest
 from sklearn.feature_selection import chi2
 import warnings
 import math
+from sklearn import svm
 
 def normaliseScores(scores):
     old_max = max(scores)
@@ -189,15 +190,11 @@ def metricsTT(test,prediction):
 ### Added to suppress warnings for ill-defined precision, should be removed if other issues arise
 warnings.filterwarnings("ignore")
 
-Features = ['fixed acidity','volatile acidity','citric acid','residual sugar','chlorides','free sulfur dioxide','total sulfur dioxide','density','pH','sulphates','alcohol']
 #
 # whiteWine = pd.read_csv("~/Desktop/Python/ML3/", sep=";")
 # redWine = pd.read_csv("/Users/markloughman/Desktop/winequality-white.csv", sep=";")
 
-print("----- winequality-white -----")
-dataframe = pd.read_csv("/home/eric/Desktop/4th Year/MachineLearning/Assignment3/Wine/winequality-white.csv", sep=";")
-X = dataframe.loc[:, Features]
-y = dataframe.quality
+
 
 # clf = neighbors.LocalOutlierFactor(n_neighbors=20)
 # y_pred = clf.fit_predict(X)
@@ -237,6 +234,6 @@ while i > 0 :
     executeRegression(Xs, y)
     print("----- Traint_Test Regression -----")
     trainTestReg(Xs,y)
-    # executeClassification(Xs, y)
+    executeClassification(Xs, y)
     i -= 1
 i = 11
