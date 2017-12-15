@@ -40,11 +40,11 @@ def regMetricEvaluation(model, X, y):
     root_mean_squared_error = np.sqrt(mean_squared_error)
     # Absoulte mean error
     abs_mean_error = cross_val_score(model, X, y, cv=10, scoring="neg_mean_absolute_error") * -1
-    # # R2 score
+    # R2 score
     r2_score = cross_val_score(model, X, y, cv=10, scoring="r2")
-    # # Median absolute error
+    # Median absolute error
     median_absolute_error = cross_val_score(model, X, y, cv=10, scoring="neg_median_absolute_error") * -1
-    # # Mean squared log error
+    # Mean squared log error
     mean_squared_log_error = cross_val_score(model, X, y, cv=10, scoring="neg_mean_squared_log_error") * -1
 
     print(math.sqrt(mean_squared_log_error.mean()))
@@ -54,6 +54,7 @@ def regMetricEvaluation(model, X, y):
     print(abs_mean_error.mean())
     return
 
+# Outputting results into a file called results.txt
 f = open("results.txt", 'w')
 sys.stdout = f
 
